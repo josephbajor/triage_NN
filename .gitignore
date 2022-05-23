@@ -17,6 +17,7 @@ docs/site/
 venv/
 my_db_config.yaml
 database.yaml
+staging.ipynb
 dirtyduck/triage/**
 
 *~

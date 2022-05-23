@@ -4,7 +4,10 @@ from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.linear_model import LogisticRegression
-
+from skorch import NeuralNetClassifier
+from torch import softmax
+import torch.nn as nn
+import torch.nn.functional as F
 from .transformers import CutOff
 
 
@@ -102,3 +105,29 @@ class ScaledLogisticRegression(BaseEstimator, ClassifierMixin):
 
     def score(self, X, y):
         return self.pipeline.score(X, y)
+
+
+class NN_Classifier_Generic(nn.Module):
+    """
+    Basic NN classifier designed to work on numeric temporal data
+    Will eventually be supplimented with models tuned for different use cases.
+    """
+    def __init__(self, input_size:int, output_size:int, num_nodes:int):
+        super().__init__()
+
+        #When using GridSearch, params that are fed into this module have to be formatted as "module__###"
+        self.input_size = input_size
+        self.output_size = output_size
+        
+        self.model = nn.Sequential(
+            nn.Linear(input_size, num_nodes),
+            nn.ReLU(),
+            nn.Dropout(0.6),
+            nn.Linear(num_nodes, 12),
+            nn.ReLU(),
+            nn.Linear(12,output_size),
+            nn.Softmax()
+        )
+        
+    def forward(self, x):
+        return self.model(x)
